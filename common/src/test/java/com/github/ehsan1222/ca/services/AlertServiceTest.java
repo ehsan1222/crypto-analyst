@@ -4,14 +4,10 @@ import com.github.ehsan1222.ca.dto.AlertOut;
 import com.github.ehsan1222.ca.entities.Alert;
 import com.github.ehsan1222.ca.exceptions.AlertNotFoundException;
 import com.github.ehsan1222.ca.repositories.AlertRepository;
-import com.github.ehsan1222.ca.services.AlertService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -33,11 +30,45 @@ class AlertServiceTest {
     @InjectMocks
     private AlertService alertService;
 
+    @Test
+    public void save_ShouldReturnSavedAlert() {
 
+        Alert alert = new Alert("ROLE_1", "BTC/USDT", 12.45, LocalDateTime.now());
+        alert.setId(2L);
+        BDDMockito.given(alertRepository.save(any(Alert.class))).willReturn(alert);
 
+        AlertOut result = alertService.save("ROLE_1", "BTC/USDT", 12.45, System.currentTimeMillis());
+
+        assertNotNull(result);
+        assertEquals(result.getId(), alert.getId());
+        assertEquals(result.getRule(), alert.getRule());
+        assertEquals(result.getMarket(), alert.getMarket());
+        assertEquals(result.getOpenDateTime(), alert.getDateCalculated());
+        Mockito.verify(alertRepository, Mockito.times(1)).save(any());
+    }
 
     @Test
-    public void get_WhenAlertNotExistShouldReturnAlertOut() {
+    public void save_GivenBlankMarketShouldThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> alertService.save("ROLE_1", "  ", 10.1, System.currentTimeMillis()));
+    }
+
+    @Test
+    public void save_GivenBlankRuleShouldThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> alertService.save("  ", null, 10.1, System.currentTimeMillis()));
+    }
+
+    @Test
+    public void save_GivenNullMarketShouldThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> alertService.save("ROLE_1", null, 10.1, System.currentTimeMillis()));
+    }
+
+    @Test
+    public void save_GivenNullRuleShouldThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> alertService.save(null, "BTC/USDT", 10.1, System.currentTimeMillis()));
+    }
+
+    @Test
+    public void get_GivenNotExistedAlertShouldThrowException() {
         BDDMockito.given(alertRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.empty());
 
         assertThrows(AlertNotFoundException.class, () -> alertService.get(1L));
@@ -45,7 +76,7 @@ class AlertServiceTest {
 
 
     @Test
-    public void get_WhenAlertExistShouldReturnAlertOut() {
+    public void get_GivenExistedAlertShouldReturnAlertOut() {
         Alert alert = new Alert("ROLE_1", "BTC/USDT", 12.01, LocalDateTime.now());
         alert.setId(1L);
         BDDMockito.given(alertRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(alert));
@@ -61,14 +92,14 @@ class AlertServiceTest {
     }
 
     @Test
-    public void get_WhenHaveNullIdShouldThrowException() {
+    public void get_GivenNullIdShouldThrowException() {
         BDDMockito.given(alertRepository.findById(null)).willThrow(IllegalArgumentException.class);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> alertService.get(null));
     }
 
     @Test
-    public void getAll_WhenHaveNoAlertShouldReturnEmptyList() {
+    public void getAll_ShouldReturnEmptyList() {
         BDDMockito.given(alertRepository.findAll()).willReturn(List.of());
 
         List<AlertOut> actualAlertOuts = alertService.getAll();

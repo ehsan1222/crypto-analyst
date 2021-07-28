@@ -23,8 +23,8 @@ public class AlertService {
         this.alertRepository = alertRepository;
     }
 
-    public AlertOut save(String rule, String market, double price, Long openDateInMillis) {
-        if (rule == null || rule.isBlank() || market == null || market.isBlank() || openDateInMillis == null) {
+    public AlertOut save(String rule, String market, double price, long openDateInMillis) {
+        if (rule == null || rule.isBlank() || market == null || market.isBlank()) {
             throw new IllegalArgumentException();
         }
         Alert alert = new Alert(rule, market, price, convertMillisToDateTime(openDateInMillis));
