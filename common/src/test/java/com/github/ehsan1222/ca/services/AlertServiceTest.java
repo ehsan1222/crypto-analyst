@@ -131,7 +131,7 @@ class AlertServiceTest {
 
     @Test
     public void convertMillisToDateTime_ShouldReturnLocalDateTime() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        LocalDateTime expected = LocalDateTime.now();
+        LocalDateTime expected = LocalDateTime.of(2020, 12, 15, 16, 32, 13);
         Long millis = expected.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         Method convertMillisToDateTimeMethod = AlertService.class.getDeclaredMethod("convertMillisToDateTime", Long.class);
@@ -141,18 +141,17 @@ class AlertServiceTest {
 
         assertNotNull(actual);
         assertEquals(expected.getClass().getName(), actual.getClass().getName());
-        assertEquals(expected.getYear(), ((LocalDateTime)actual).getYear());
-        assertEquals(expected.getMonth(), ((LocalDateTime)actual).getMonth());
-        assertEquals(expected.getDayOfMonth(), ((LocalDateTime)actual).getDayOfMonth());
-        assertEquals(expected.getHour(), ((LocalDateTime)actual).getHour());
-        assertEquals(expected.getMinute(), ((LocalDateTime)actual).getMinute());
-        assertEquals(expected.getSecond(), ((LocalDateTime)actual).getSecond());
+        assertEquals(2020, ((LocalDateTime)actual).getYear());
+        assertEquals(12, ((LocalDateTime)actual).getMonth().getValue());
+        assertEquals(15, ((LocalDateTime)actual).getDayOfMonth());
+        assertEquals(16, ((LocalDateTime)actual).getHour());
+        assertEquals(32, ((LocalDateTime)actual).getMinute());
+        assertEquals(13, ((LocalDateTime)actual).getSecond());
     }
 
 
     @Test
     public void convertToDto_ShouldReturnDto() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
         LocalDateTime openDateTime = LocalDateTime.now();
         Alert alert = new Alert("ROLE_1", "BTC/USDT", 100.024, openDateTime);
         alert.setId(1L);
