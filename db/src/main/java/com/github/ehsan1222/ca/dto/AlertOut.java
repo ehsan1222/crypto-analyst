@@ -14,5 +14,5 @@ public class AlertOut {
     private String rule;
     private String market;
     private double price;
-    private LocalDateTime openDateTime;
+    private LocalDateTime dataDateTime;
 }

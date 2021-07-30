@@ -23,11 +23,11 @@ public class AlertService {
         this.alertRepository = alertRepository;
     }
 
-    public AlertOut save(String rule, String market, double price, long openDateInMillis) {
+    public AlertOut save(String rule, String market, double price, long closeTimestampInMillis) {
         if (rule == null || rule.isBlank() || market == null || market.isBlank()) {
             throw new IllegalArgumentException();
         }
-        Alert alert = new Alert(rule, market, price, convertMillisToDateTime(openDateInMillis));
+        Alert alert = new Alert(rule, market, price, convertMillisToDateTime(closeTimestampInMillis));
         Alert savedAlert = alertRepository.save(alert);
         return convertToDto(savedAlert);
     }
@@ -39,7 +39,7 @@ public class AlertService {
     }
 
     public List<AlertOut> getAll() {
-        return alertRepository.findAll()
+        return alertRepository.findAllOrderByCloseDateDesc()
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -56,6 +56,6 @@ public class AlertService {
                 alert.getRule(),
                 alert.getMarket(),
                 alert.getPrice(),
-                alert.getDateCalculated());
+                alert.getCloseDate());
     }
 }

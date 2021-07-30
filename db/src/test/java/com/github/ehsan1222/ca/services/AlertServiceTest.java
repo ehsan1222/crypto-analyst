@@ -43,7 +43,7 @@ class AlertServiceTest {
         assertEquals(result.getId(), alert.getId());
         assertEquals(result.getRule(), alert.getRule());
         assertEquals(result.getMarket(), alert.getMarket());
-        assertEquals(result.getOpenDateTime(), alert.getDateCalculated());
+        assertEquals(result.getDataDateTime(), alert.getCloseDate());
         Mockito.verify(alertRepository, Mockito.times(1)).save(any());
     }
 
@@ -88,7 +88,7 @@ class AlertServiceTest {
         assertEquals(alert.getRule(), actual.getRule());
         assertEquals(alert.getMarket(), actual.getMarket());
         assertEquals(alert.getPrice(), actual.getPrice());
-        assertEquals(alert.getDateCalculated(), actual.getOpenDateTime());
+        assertEquals(alert.getCloseDate(), actual.getDataDateTime());
     }
 
     @Test
@@ -100,7 +100,7 @@ class AlertServiceTest {
 
     @Test
     public void getAll_ShouldReturnEmptyList() {
-        BDDMockito.given(alertRepository.findAll()).willReturn(List.of());
+        BDDMockito.given(alertRepository.findAllOrderByCloseDateDesc()).willReturn(List.of());
 
         List<AlertOut> actualAlertOuts = alertService.getAll();
 
@@ -114,19 +114,18 @@ class AlertServiceTest {
         alert1.setId(1L);
         Alert alert2 = new Alert("ROLE_2", "ETH/USDT", 15.17, LocalDateTime.now());
         alert2.setId(2L);
-        List<Alert> mockAlerts = List.of(alert1, alert2);
-        BDDMockito.given(alertRepository.findAll()).willReturn(mockAlerts);
+        List<Alert> mockAlerts = List.of(alert2, alert1);
+        BDDMockito.given(alertRepository.findAllOrderByCloseDateDesc()).willReturn(mockAlerts);
         List<AlertOut> expectedAlertOuts = List.of(
-                new AlertOut(alert1.getId(), alert1.getRule(), alert1.getMarket(), alert1.getPrice(), alert1.getDateCalculated()),
-                new AlertOut(alert2.getId(), alert2.getRule(), alert2.getMarket(), alert2.getPrice(), alert2.getDateCalculated())
+                new AlertOut(alert2.getId(), alert2.getRule(), alert2.getMarket(), alert2.getPrice(), alert2.getCloseDate()),
+                new AlertOut(alert1.getId(), alert1.getRule(), alert1.getMarket(), alert1.getPrice(), alert1.getCloseDate())
         );
 
         List<AlertOut> actualAlertOuts = alertService.getAll();
 
         assertNotNull(actualAlertOuts);
         assertEquals(actualAlertOuts.size(), 2);
-        assertEquals(actualAlertOuts.get(0), expectedAlertOuts.get(0));
-        assertEquals(actualAlertOuts.get(1), expectedAlertOuts.get(1));
+        assertArrayEquals(actualAlertOuts.toArray(), expectedAlertOuts.toArray());
     }
 
     @Test
@@ -140,13 +139,7 @@ class AlertServiceTest {
         convertMillisToDateTimeMethod.setAccessible(false);
 
         assertNotNull(actual);
-        assertEquals(expected.getClass().getName(), actual.getClass().getName());
-        assertEquals(2020, ((LocalDateTime)actual).getYear());
-        assertEquals(12, ((LocalDateTime)actual).getMonth().getValue());
-        assertEquals(15, ((LocalDateTime)actual).getDayOfMonth());
-        assertEquals(16, ((LocalDateTime)actual).getHour());
-        assertEquals(32, ((LocalDateTime)actual).getMinute());
-        assertEquals(13, ((LocalDateTime)actual).getSecond());
+        assertEquals(expected, actual);
     }
 
 
@@ -155,7 +148,7 @@ class AlertServiceTest {
         LocalDateTime openDateTime = LocalDateTime.now();
         Alert alert = new Alert("ROLE_1", "BTC/USDT", 100.024, openDateTime);
         alert.setId(1L);
-        AlertOut expected = new AlertOut(1, "ROLE_1", "BTC/USDT", 100.024 , openDateTime);
+        AlertOut expected = new AlertOut(1, "ROLE_1", "BTC/USDT", 100.024, openDateTime);
 
         Method convertToDtoMethod = AlertService.class.getDeclaredMethod("convertToDto", Alert.class);
         convertToDtoMethod.setAccessible(true);

@@ -27,14 +27,14 @@ public class Alert {
 
     private double price;
 
-    @Column(name = "date_calculated")
-    private LocalDateTime dateCalculated;
+    @Column(name = "close_date")
+    private LocalDateTime closeDate;
 
-    public Alert(String rule, String market, double price, LocalDateTime dateCalculated) {
+    public Alert(String rule, String market, double price, LocalDateTime closeDate) {
         this.rule = rule;
         this.market = market;
         this.price = price;
-        this.dateCalculated = dateCalculated;
+        this.closeDate = closeDate;
     }
 
     @Override
