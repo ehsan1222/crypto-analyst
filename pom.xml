@@ -13,7 +13,9 @@
 	<groupId>com.github.ehsan1222.ca</groupId>
 	<artifactId>crypto-analyst</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+
 	<packaging>pom</packaging>
+
 	<name>crypto-analyst</name>
 	<description>A Simple Cryptocurrency Analyst</description>
 
@@ -22,10 +24,11 @@
 	</properties>
 
 	<modules>
-		<module>common</module>
+		<module>db</module>
 		<module>eval</module>
 		<module>request</module>
-		<module>api</module>
+		<module>web</module>
+		<module>kafka-common</module>
 	</modules>
 
 	<dependencies>
