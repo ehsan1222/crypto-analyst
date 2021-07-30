@@ -13,9 +13,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.binance.api</groupId>
-            <artifactId>binance-api-client</artifactId>
-            <version>1.0.1</version>
+            <groupId>com.github.ehsan1222.ca</groupId>
+            <artifactId>kafka-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
