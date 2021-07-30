@@ -23,6 +23,14 @@ public class AlertService {
         this.alertRepository = alertRepository;
     }
 
+    /**
+     * Store new Alert
+     * @param rule the pattern name
+     * @param market the market name
+     * @param price current crypto price
+     * @param closeTimestampInMillis close timestamp in millis in candlestick bar
+     * @return return {@link AlertOut}
+     */
     public AlertOut save(String rule, String market, double price, long closeTimestampInMillis) {
         if (rule == null || rule.isBlank() || market == null || market.isBlank()) {
             throw new IllegalArgumentException();
@@ -32,12 +40,21 @@ public class AlertService {
         return convertToDto(savedAlert);
     }
 
+    /**
+     * Get entity by id value
+     * @param id the entity id
+     * @return return {@link AlertOut}
+     */
     public AlertOut get(Long id) {
         return alertRepository.findById(id)
                 .map(this::convertToDto)
                 .orElseThrow(() -> new AlertNotFoundException(String.format("alert %d not found", id)));
     }
 
+    /**
+     * Get all alerts
+     * @return return {@link AlertOut}
+     */
     public List<AlertOut> getAll() {
         return alertRepository.findAllOrderByCloseDateDesc()
                 .stream()
@@ -45,12 +62,22 @@ public class AlertService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * convert millisecond to {@link LocalDateTime}
+     * @param millis timestamp in millisecond
+     * @return {@link LocalDateTime} of millis
+     */
     private LocalDateTime convertMillisToDateTime(Long millis) {
         return Instant.ofEpochMilli(millis)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
 
+    /**
+     * convert {@link Alert} entity to {@link AlertOut} dto
+     * @param alert {@link Alert} entity
+     * @return return {@link AlertOut} dto
+     */
     private AlertOut convertToDto(Alert alert) {
         return new AlertOut(alert.getId(),
                 alert.getRule(),
