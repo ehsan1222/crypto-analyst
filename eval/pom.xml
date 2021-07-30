@@ -11,6 +11,28 @@
 
     <artifactId>eval</artifactId>
 
+    <properties>
+        <kafka-common.version>0.0.1-SNAPSHOT</kafka-common.version>
+        <db.version>0.0.1-SNAPSHOT</db.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.ehsan1222.ca</groupId>
+            <artifactId>kafka-common</artifactId>
+            <version>${kafka-common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ehsan1222.ca</groupId>
+            <artifactId>db</artifactId>
+            <version>${db.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
