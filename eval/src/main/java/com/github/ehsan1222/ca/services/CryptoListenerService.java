@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.github.ehsan1222.ca.constants.KafkaConstants.BTC_TOPIC_NAME;
 import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
@@ -21,13 +24,10 @@ import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
 @Service
 public class CryptoListenerService {
 
+    private final RuleEvaluator ruleEvaluator;
     @Value("${app.patternPath}")
     private String patternConfigPath;
-
     private Map<String, List<Rule>> ruleMap;
-
-    private final RuleEvaluator ruleEvaluator;
-
     private String patternConfigMD5;
 
     public CryptoListenerService(RuleEvaluator ruleEvaluator) {
@@ -52,14 +52,12 @@ public class CryptoListenerService {
     }
 
     private boolean isPatternChanged(String patternMD5) {
-        synchronized (CryptoListenerService.class) {
-            if (patternMD5 == null) {
-                return true;
-            }
-            FileManager fileManager = new FileManager();
-            String currentPatternMD5Hash = fileManager.getMD5Hash(Paths.get(patternConfigPath));
-            return !currentPatternMD5Hash.equals(patternMD5);
+        if (patternMD5 == null) {
+            return true;
         }
+        FileManager fileManager = new FileManager();
+        String currentPatternMD5Hash = fileManager.getMD5Hash(Paths.get(patternConfigPath));
+        return !currentPatternMD5Hash.equals(patternMD5);
     }
 
     private void getPatters() {
@@ -76,7 +74,7 @@ public class CryptoListenerService {
 
     private Map<String, List<Rule>> getRuleMap(List<Rule> rules) {
         Map<String, List<Rule>> ruleMap = new HashMap<>();
-        for(Rule rule: rules) {
+        for (Rule rule : rules) {
             if (ruleMap.containsKey(rule.getMarketName())) {
                 ruleMap.get(rule.getMarketName()).add(rule);
             } else {
