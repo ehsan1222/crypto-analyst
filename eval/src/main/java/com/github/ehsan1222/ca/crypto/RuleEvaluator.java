@@ -35,7 +35,6 @@ public class RuleEvaluator {
             double firstMeanValue = getMeanValue(candlesticks, rule.getFirstInterval(), rule.getType());
             double lastMeanValue = getMeanValue(candlesticks, rule.getLastInterval(), rule.getType());
             if (isEvaluate(firstMeanValue, lastMeanValue, rule.getCheck())) {
-                System.out.println(candlesticks);
                 Candlestick lastCandlestick = candlesticks.get(candlesticks.size() - 1);
                 double currentPrice = Double.parseDouble(lastCandlestick.getClose());
                 alertService.save(rule.getName(), rule.getMarketName(), currentPrice, lastCandlestick.getCloseTime());
