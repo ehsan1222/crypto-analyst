@@ -56,7 +56,7 @@ public class RuleEvaluator {
     }
 
     public double getMeanValue(List<Candlestick> candlesticks, int interval, RuleType ruleType) {
-        if (interval < 0 || interval > candlesticks.size()) {
+        if (interval < 1 || interval > candlesticks.size()) {
             throw new IllegalStateException();
         }
         double mean = 0;
