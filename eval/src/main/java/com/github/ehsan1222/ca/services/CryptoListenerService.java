@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ehsan1222.ca.crypto.RuleEvaluator;
-import com.github.ehsan1222.ca.dao.Rule;
+import com.github.ehsan1222.ca.dao.Pattern;
 import com.github.ehsan1222.ca.io.FileManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -27,7 +27,7 @@ public class CryptoListenerService {
     private final RuleEvaluator ruleEvaluator;
     @Value("${app.patternPath}")
     private String patternConfigPath;
-    private Map<String, List<Rule>> ruleMap;
+    private Map<String, List<Pattern>> patternMap;
     private String patternConfigMD5;
 
     public CryptoListenerService(RuleEvaluator ruleEvaluator) {
@@ -40,7 +40,7 @@ public class CryptoListenerService {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
-        ruleEvaluator.evaluate(candlesticks, this.ruleMap.get("BTC/USDT"));
+        ruleEvaluator.evaluate(candlesticks, this.patternMap.get("BTC/USDT"));
     }
 
     @KafkaListener(topics = ETH_TOPIC_NAME, groupId = "eth")
@@ -48,7 +48,7 @@ public class CryptoListenerService {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
-        ruleEvaluator.evaluate(candlesticks, this.ruleMap.get("ETH/USDT"));
+        ruleEvaluator.evaluate(candlesticks, this.patternMap.get("ETH/USDT"));
     }
 
     private boolean isPatternChanged(String patternMD5) {
@@ -65,30 +65,30 @@ public class CryptoListenerService {
             if (isPatternChanged(patternConfigMD5)) {
                 FileManager fileManager = new FileManager();
                 String pattersPath = fileManager.read(Path.of(patternConfigPath));
-                List<Rule> rules = convertJsonToRule(pattersPath);
-                this.ruleMap = getRuleMap(rules);
+                List<Pattern> patterns = convertJsonToPattern(pattersPath);
+                this.patternMap = getPatternMap(patterns);
                 this.patternConfigMD5 = fileManager.getMD5Hash(Paths.get(patternConfigPath));
             }
         }
     }
 
-    private Map<String, List<Rule>> getRuleMap(List<Rule> rules) {
-        Map<String, List<Rule>> ruleMap = new HashMap<>();
-        for (Rule rule : rules) {
-            if (ruleMap.containsKey(rule.getMarketName())) {
-                ruleMap.get(rule.getMarketName()).add(rule);
+    private Map<String, List<Pattern>> getPatternMap(List<Pattern> patterns) {
+        Map<String, List<Pattern>> patternMap = new HashMap<>();
+        for (Pattern pattern : patterns) {
+            if (patternMap.containsKey(pattern.getMarketName())) {
+                patternMap.get(pattern.getMarketName()).add(pattern);
             } else {
-                ruleMap.put(rule.getMarketName(), new ArrayList<>(List.of(rule)));
+                patternMap.put(pattern.getMarketName(), new ArrayList<>(List.of(pattern)));
             }
         }
-        return ruleMap;
+        return patternMap;
     }
 
-    private List<Rule> convertJsonToRule(String pattersJson) {
+    private List<Pattern> convertJsonToPattern(String pattersJson) {
         try {
             return new ObjectMapper()
                     .readValue(pattersJson,
-                            new TypeReference<ArrayList<Rule>>() {
+                            new TypeReference<ArrayList<Pattern>>() {
                             });
         } catch (JsonProcessingException e) {
             return new ArrayList<>();

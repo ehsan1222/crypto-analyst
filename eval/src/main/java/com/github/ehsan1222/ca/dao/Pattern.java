@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Rule {
+public class Pattern {
 
-    private String name;
+    private String rule;
 
     @JsonProperty("market_name")
     private String marketName;
 
-    private RuleType type;
+    private PatternType type;
 
     @JsonProperty("first_interval")
     private Integer firstInterval;
@@ -19,6 +19,6 @@ public class Rule {
     @JsonProperty("last_interval")
     private Integer lastInterval;
 
-    private Integer check;
+    private PatternCheck check;
 
 }

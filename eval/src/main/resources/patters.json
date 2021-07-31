@@ -1,18 +1,18 @@
 [
   {
-    "name": "ROLE_1",
+    "rule": "ROLE_1",
     "market_name": "BTC/USDT",
     "type": "CLOSE",
     "first_interval": 12,
     "last_interval": 26,
-    "check": 1
+    "check": "GREATER_THAN"
   },
   {
-    "name": "ROLE_2",
+    "rule": "ROLE_2",
     "market_name": "ETH/USDT",
     "type": "OPEN",
     "first_interval": 5,
     "last_interval": 35,
-    "check": -1
+    "check": "LESS_THAN"
   }
 ]
