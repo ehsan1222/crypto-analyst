@@ -29,8 +29,6 @@ public class kafkaConsumerConfig {
     public ConsumerFactory<String, List<Candlestick>> consumerFactory() {
         Map<String, Object> configs = new HashMap<>();
         configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-//        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-//        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 
         ObjectMapper om = new ObjectMapper();
         JavaType javaType = om.getTypeFactory().constructParametricType(List.class, Candlestick.class);

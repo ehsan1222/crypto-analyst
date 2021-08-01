@@ -27,16 +27,10 @@ public class FileManager {
             return "";
         }
         try {
-
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(Files.readAllBytes(path));
             byte[] digest = md.digest();
             return DatatypeConverter.printHexBinary(digest).toUpperCase();
-
-//            byte[] file = Files.readAllBytes(path);
-//            MessageDigest md5MD = MessageDigest.getInstance("MD5");
-//            byte[] md5hashByte = md5MD.digest(file);
-//            return DatatypeConverter.printHexBinary(md5hashByte);
         } catch (NoSuchAlgorithmException | IOException e) {
             // TODO: logger
             return "";

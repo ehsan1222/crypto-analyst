@@ -16,13 +16,16 @@ import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
 public class RetrieveCryptoProcess {
 
     private static final int TIME_INTERVAL_IN_MILLIS = 60000;
-    private static final Integer NUM_CANDLESTICK_BARS = 100;
+    private static final Integer FIRST_CANDLESTICK_BATCH = 100;
 
     @Value("${BINANCE.APIKEY}")
     private String apiKey;
 
     @Value("${BINANCE.SECRET_KEY}")
     private String secretKey;
+
+    private boolean isFirstBtcRequest = true;
+    private boolean isFirstEthRequest = true;
 
     private final CryptoSenderService cryptoSenderService;
 
@@ -32,18 +35,32 @@ public class RetrieveCryptoProcess {
 
     @Scheduled(fixedRate = TIME_INTERVAL_IN_MILLIS)
     public void btcCandlestickBarsSchedule() {
-        List<Candlestick> btcCandlesticks = getCandlesticks("BTCBUSD");
+        int numberOfCandlestickBars;
+        if (isFirstBtcRequest) {
+            numberOfCandlestickBars = FIRST_CANDLESTICK_BATCH;
+            isFirstBtcRequest = false;
+        } else {
+            numberOfCandlestickBars = 1;
+        }
+        List<Candlestick> btcCandlesticks = getCandlesticks("BTCBUSD", numberOfCandlestickBars);
         cryptoSenderService.sendMessage(BTC_TOPIC_NAME, btcCandlesticks);
     }
 
     @Scheduled(fixedRate = TIME_INTERVAL_IN_MILLIS)
     public void ethCandlestickBarsSchedule() {
-        List<Candlestick> ethCandlesticks = getCandlesticks("ETHBUSD");
+        int numberOfCandlestickBars;
+        if (isFirstEthRequest) {
+            numberOfCandlestickBars = FIRST_CANDLESTICK_BATCH;
+            isFirstEthRequest = false;
+        } else {
+            numberOfCandlestickBars = 1;
+        }
+        List<Candlestick> ethCandlesticks = getCandlesticks("ETHBUSD", numberOfCandlestickBars);
         cryptoSenderService.sendMessage(ETH_TOPIC_NAME, ethCandlesticks);
     }
 
-    private List<Candlestick> getCandlesticks(String symbol) {
+    private List<Candlestick> getCandlesticks(String symbol, int numberOfCandlestickBars) {
         BinanceCryptoMarket market = new BinanceCryptoMarket(apiKey, secretKey);
-        return market.getCandlesticks(symbol, CandlestickInterval.ONE_MINUTE, NUM_CANDLESTICK_BARS);
+        return market.getCandlesticks(symbol, CandlestickInterval.ONE_MINUTE, numberOfCandlestickBars);
     }
 }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.ehsan1222.ca.constants.KafkaConstants.BTC_TOPIC_NAME;
 import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
@@ -28,6 +29,7 @@ public class CryptoListenerService {
     @Value("${app.patternPath}")
     private String patternConfigPath;
     private Map<String, List<Pattern>> patternMap;
+    private Map<String, List<Candlestick>> cryptoMap;
     private String patternConfigMD5;
 
     public CryptoListenerService(RuleEvaluator ruleEvaluator) {
@@ -40,6 +42,7 @@ public class CryptoListenerService {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
+        addCryptoMap("btc", candlesticks);
         ruleEvaluator.evaluate(candlesticks, this.patternMap.get("BTC/USDT"));
     }
 
@@ -48,7 +51,21 @@ public class CryptoListenerService {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
+        addCryptoMap("eth", candlesticks);
         ruleEvaluator.evaluate(candlesticks, this.patternMap.get("ETH/USDT"));
+    }
+
+    private void addCryptoMap(String symbol, ArrayList<Candlestick> candlesticks) {
+        if (cryptoMap == null) {
+            cryptoMap = new ConcurrentHashMap<>();
+        }
+
+        if (cryptoMap.containsKey(symbol)) {
+            cryptoMap.get(symbol).addAll(candlesticks);
+            cryptoMap.get(symbol).subList(0, candlesticks.size()).clear();
+        } else {
+            cryptoMap.put(symbol, candlesticks);
+        }
     }
 
     private boolean isPatternChanged(String patternMD5) {

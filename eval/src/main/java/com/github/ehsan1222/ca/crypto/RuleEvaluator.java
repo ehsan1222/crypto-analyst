@@ -31,17 +31,27 @@ public class RuleEvaluator {
         if (pattern == null) {
             return;
         }
-        try {
-            double firstMeanValue = getMeanValue(candlesticks, pattern.getFirstInterval(), pattern.getType());
-            double lastMeanValue = getMeanValue(candlesticks, pattern.getLastInterval(), pattern.getType());
-            if (isEvaluate(firstMeanValue, lastMeanValue, pattern.getCheck())) {
-                Candlestick lastCandlestick = candlesticks.get(candlesticks.size() - 1);
-                double currentPrice = Double.parseDouble(lastCandlestick.getClose());
-                alertService.save(pattern.getRule(), pattern.getMarketName(), currentPrice, lastCandlestick.getCloseTime());
+        if (isHaveEnoughItems(candlesticks, pattern)) {
+            try {
+                double firstMeanValue = getMeanValue(candlesticks, pattern.getFirstInterval(), pattern.getType());
+                double lastMeanValue = getMeanValue(candlesticks, pattern.getLastInterval(), pattern.getType());
+                if (isEvaluate(firstMeanValue, lastMeanValue, pattern.getCheck())) {
+                    Candlestick lastCandlestick = candlesticks.get(candlesticks.size() - 1);
+                    double currentPrice = Double.parseDouble(lastCandlestick.getClose());
+                    alertService.save(pattern.getRule(), pattern.getMarketName(), currentPrice, lastCandlestick.getCloseTime());
+                }
+            } catch (IllegalStateException e) {
+
             }
-        } catch (IllegalStateException e) {
+        } else{
+            // TODO: log it, if have not enough items
 
         }
+    }
+
+    private boolean isHaveEnoughItems(List<Candlestick> candlesticks, Pattern pattern) {
+        return candlesticks.size() > pattern.getFirstInterval() &&
+                candlesticks.size() > pattern.getLastInterval();
     }
 
     private boolean isEvaluate(double first, double last, PatternCheck check) {
