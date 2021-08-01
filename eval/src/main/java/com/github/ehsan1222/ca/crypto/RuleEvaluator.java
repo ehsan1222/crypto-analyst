@@ -31,7 +31,7 @@ public class RuleEvaluator {
         if (pattern == null) {
             return;
         }
-        if (isHaveEnoughItems(candlesticks, pattern)) {
+        if (haveEnoughCandlesticksItems(candlesticks, pattern)) {
             try {
                 double firstMeanValue = getMeanValue(candlesticks, pattern.getFirstInterval(), pattern.getType());
                 double lastMeanValue = getMeanValue(candlesticks, pattern.getLastInterval(), pattern.getType());
@@ -49,7 +49,7 @@ public class RuleEvaluator {
         }
     }
 
-    private boolean isHaveEnoughItems(List<Candlestick> candlesticks, Pattern pattern) {
+    private boolean haveEnoughCandlesticksItems(List<Candlestick> candlesticks, Pattern pattern) {
         return candlesticks.size() > pattern.getFirstInterval() &&
                 candlesticks.size() > pattern.getLastInterval();
     }
