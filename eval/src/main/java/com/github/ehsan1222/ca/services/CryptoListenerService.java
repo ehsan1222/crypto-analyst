@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ehsan1222.ca.crypto.RuleEvaluator;
 import com.github.ehsan1222.ca.dao.Pattern;
 import com.github.ehsan1222.ca.io.FileManager;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -38,21 +40,23 @@ public class CryptoListenerService {
 
 
     @KafkaListener(topics = BTC_TOPIC_NAME, groupId = "btc")
-    public void listenToBTCCandlestickBars(ArrayList<Candlestick> candlesticks) {
+    public void listenToBTCCandlestickBars(ArrayList<Candlestick> candlesticks, Acknowledgment ack) {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
         addCryptoMap("btc", candlesticks);
         ruleEvaluator.evaluate(candlesticks, this.patternMap.get("BTC/USDT"));
+        ack.acknowledge();
     }
 
     @KafkaListener(topics = ETH_TOPIC_NAME, groupId = "eth")
-    public void listenToETHCandlestickBars(ArrayList<Candlestick> candlesticks) {
+    public void listenToETHCandlestickBars(ArrayList<Candlestick> candlesticks, Acknowledgment ack) {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
         addCryptoMap("eth", candlesticks);
         ruleEvaluator.evaluate(candlesticks, this.patternMap.get("ETH/USDT"));
+        ack.acknowledge();
     }
 
     private void addCryptoMap(String symbol, ArrayList<Candlestick> candlesticks) {
