@@ -8,11 +8,27 @@
     "check": "GREATER_THAN"
   },
   {
+    "rule": "ROLE_4",
+    "market_name": "BTC/USDT",
+    "type": "OPEN",
+    "first_interval": 6,
+    "last_interval": 37,
+    "check": "LESS_THAN"
+  },
+  {
     "rule": "ROLE_2",
     "market_name": "ETH/USDT",
     "type": "OPEN",
-    "first_interval": 5,
-    "last_interval": 35,
+    "first_interval": 6,
+    "last_interval": 32,
+    "check": "LESS_THAN"
+  },
+  {
+    "rule": "ROLE_3",
+    "market_name": "ETH/USDT",
+    "type": "OPEN",
+    "first_interval": 6,
+    "last_interval": 37,
     "check": "LESS_THAN"
   }
 ]
