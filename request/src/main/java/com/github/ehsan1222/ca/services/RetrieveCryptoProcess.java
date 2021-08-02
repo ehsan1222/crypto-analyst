@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.github.ehsan1222.ca.constants.BinanceConstants.FIRST_CANDLESTICK_BATCH_SIZE;
 import static com.github.ehsan1222.ca.constants.KafkaConstants.BTC_TOPIC_NAME;
 import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
 
@@ -16,7 +17,6 @@ import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
 public class RetrieveCryptoProcess {
 
     private static final int TIME_INTERVAL_IN_MILLIS = 60000;
-    private static final Integer FIRST_CANDLESTICK_BATCH = 100;
 
     @Value("${BINANCE.APIKEY}")
     private String apiKey;
@@ -37,7 +37,7 @@ public class RetrieveCryptoProcess {
     public void btcCandlestickBarsSchedule() {
         int numberOfCandlestickBars;
         if (isFirstBtcRequest) {
-            numberOfCandlestickBars = FIRST_CANDLESTICK_BATCH;
+            numberOfCandlestickBars = FIRST_CANDLESTICK_BATCH_SIZE;
             isFirstBtcRequest = false;
         } else {
             numberOfCandlestickBars = 1;
@@ -50,7 +50,7 @@ public class RetrieveCryptoProcess {
     public void ethCandlestickBarsSchedule() {
         int numberOfCandlestickBars;
         if (isFirstEthRequest) {
-            numberOfCandlestickBars = FIRST_CANDLESTICK_BATCH;
+            numberOfCandlestickBars = FIRST_CANDLESTICK_BATCH_SIZE;
             isFirstEthRequest = false;
         } else {
             numberOfCandlestickBars = 1;
