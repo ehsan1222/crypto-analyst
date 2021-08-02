@@ -4,9 +4,11 @@ import com.binance.api.client.domain.market.Candlestick;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.ehsan1222.ca.constants.BinanceConstants;
 import com.github.ehsan1222.ca.crypto.RuleEvaluator;
 import com.github.ehsan1222.ca.dao.Pattern;
 import com.github.ehsan1222.ca.io.FileManager;
+import lombok.extern.java.Log;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,10 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.github.ehsan1222.ca.constants.BinanceConstants.FIRST_CANDLESTICK_BATCH_SIZE;
 import static com.github.ehsan1222.ca.constants.KafkaConstants.BTC_TOPIC_NAME;
 import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
 
 @Service
+@Log
 public class CryptoListenerService {
 
     private final RuleEvaluator ruleEvaluator;
@@ -44,8 +48,9 @@ public class CryptoListenerService {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
-        addCryptoMap("btc", candlesticks);
-        ruleEvaluator.evaluate(candlesticks, this.patternMap.get("BTC/USDT"));
+        String BTCSymbol = "btc";
+        addCryptoMap(BTCSymbol, candlesticks);
+        ruleEvaluator.evaluate(cryptoMap.get(BTCSymbol), this.patternMap.get("BTC/USDT"));
         ack.acknowledge();
     }
 
@@ -54,8 +59,9 @@ public class CryptoListenerService {
         if (isPatternChanged(patternConfigMD5)) {
             getPatters();
         }
-        addCryptoMap("eth", candlesticks);
-        ruleEvaluator.evaluate(candlesticks, this.patternMap.get("ETH/USDT"));
+        String ETHSymbol = "eth";
+        addCryptoMap(ETHSymbol, candlesticks);
+        ruleEvaluator.evaluate(cryptoMap.get(ETHSymbol), this.patternMap.get("ETH/USDT"));
         ack.acknowledge();
     }
 
@@ -65,8 +71,12 @@ public class CryptoListenerService {
         }
 
         if (cryptoMap.containsKey(symbol)) {
-            cryptoMap.get(symbol).addAll(candlesticks);
-            cryptoMap.get(symbol).subList(0, candlesticks.size()).clear();
+            List<Candlestick> currentCandlesticks = cryptoMap.get(symbol);
+            currentCandlesticks.addAll(candlesticks);
+            if (currentCandlesticks.size() > FIRST_CANDLESTICK_BATCH_SIZE) {
+                int numberOfExtraItems = currentCandlesticks.size() - FIRST_CANDLESTICK_BATCH_SIZE;
+                currentCandlesticks.subList(0, numberOfExtraItems).clear();
+            }
         } else {
             cryptoMap.put(symbol, candlesticks);
         }
@@ -89,6 +99,7 @@ public class CryptoListenerService {
                 List<Pattern> patterns = convertJsonToPattern(pattersPath);
                 this.patternMap = getPatternMap(patterns);
                 this.patternConfigMD5 = fileManager.getMD5Hash(Paths.get(patternConfigPath));
+                log.info("The pattern map was updated!");
             }
         }
     }
@@ -106,12 +117,17 @@ public class CryptoListenerService {
     }
 
     private List<Pattern> convertJsonToPattern(String pattersJson) {
+        if (pattersJson == null) {
+            log.warning("null pattern json was entered");
+            return new ArrayList<>();
+        }
         try {
             return new ObjectMapper()
                     .readValue(pattersJson,
                             new TypeReference<ArrayList<Pattern>>() {
                             });
         } catch (JsonProcessingException e) {
+            log.warning("invalid json format " + pattersJson);
             return new ArrayList<>();
         }
     }
