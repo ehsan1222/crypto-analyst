@@ -5,11 +5,13 @@ import com.github.ehsan1222.ca.dao.Pattern;
 import com.github.ehsan1222.ca.dao.PatternCheck;
 import com.github.ehsan1222.ca.dao.PatternType;
 import com.github.ehsan1222.ca.services.AlertService;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Log
 public class RuleEvaluator {
 
     private final AlertService alertService;
@@ -20,6 +22,7 @@ public class RuleEvaluator {
 
     public void evaluate(List<Candlestick> candlesticks, List<Pattern> patterns) {
         if (patterns == null || patterns.size() == 0) {
+            log.info("there is not any pattern to evaluate");
             return;
         }
         for (Pattern pattern : patterns) {
@@ -27,25 +30,23 @@ public class RuleEvaluator {
         }
     }
 
-    public void evaluate(List<Candlestick> candlesticks, Pattern pattern) {
+    private void evaluate(List<Candlestick> candlesticks, Pattern pattern) {
         if (pattern == null) {
+            log.warning("null pattern was entered");
             return;
         }
         if (haveEnoughCandlesticksItems(candlesticks, pattern)) {
-            try {
-                double firstMeanValue = getMeanValue(candlesticks, pattern.getFirstInterval(), pattern.getType());
-                double lastMeanValue = getMeanValue(candlesticks, pattern.getLastInterval(), pattern.getType());
-                if (isEvaluate(firstMeanValue, lastMeanValue, pattern.getCheck())) {
-                    Candlestick lastCandlestick = candlesticks.get(candlesticks.size() - 1);
-                    double currentPrice = Double.parseDouble(lastCandlestick.getClose());
-                    alertService.save(pattern.getRule(), pattern.getMarketName(), currentPrice, lastCandlestick.getCloseTime());
-                }
-            } catch (IllegalStateException e) {
-
+            double firstMeanValue = getMeanValue(candlesticks, pattern.getFirstInterval(), pattern.getType());
+            double lastMeanValue = getMeanValue(candlesticks, pattern.getLastInterval(), pattern.getType());
+            log.info("firstMeanValue = " + firstMeanValue + ", lastMeanValue = " + lastMeanValue + ", candlestick size = " + candlesticks.size());
+            if (isEvaluate(firstMeanValue, lastMeanValue, pattern.getCheck())) {
+                Candlestick lastCandlestick = candlesticks.get(candlesticks.size() - 1);
+                double currentPrice = Double.parseDouble(lastCandlestick.getClose());
+                alertService.save(pattern.getRule(), pattern.getMarketName(), currentPrice, lastCandlestick.getCloseTime());
             }
-        } else{
-            // TODO: log it, if have not enough items
-
+        } else {
+            log.info(String.format("candlestick hasn't enough items because candlestick size is %d but pattern interval is %d",
+                    candlesticks.size(), Math.max(pattern.getFirstInterval(), pattern.getLastInterval())));
         }
     }
 
@@ -70,9 +71,9 @@ public class RuleEvaluator {
         return false;
     }
 
-    public double getMeanValue(List<Candlestick> candlesticks, int interval, PatternType patternType) {
+    private double getMeanValue(List<Candlestick> candlesticks, int interval, PatternType patternType) {
         if (interval < 1 || interval > candlesticks.size()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("invalid interval range");
         }
         double mean = 0;
         for (int i = candlesticks.size() - 1; i >= candlesticks.size() - interval; i--) {
@@ -94,7 +95,7 @@ public class RuleEvaluator {
             case CLOSE:
                 return Double.parseDouble(candlestick.getClose());
         }
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
 }
