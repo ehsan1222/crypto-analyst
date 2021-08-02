@@ -30,7 +30,7 @@ public class RuleEvaluator {
         }
     }
 
-    private void evaluate(List<Candlestick> candlesticks, Pattern pattern) {
+    protected void evaluate(List<Candlestick> candlesticks, Pattern pattern) {
         if (pattern == null) {
             log.warning("null pattern was entered");
             return;
@@ -50,12 +50,12 @@ public class RuleEvaluator {
         }
     }
 
-    private boolean haveEnoughCandlesticksItems(List<Candlestick> candlesticks, Pattern pattern) {
+    protected boolean haveEnoughCandlesticksItems(List<Candlestick> candlesticks, Pattern pattern) {
         return candlesticks.size() > pattern.getFirstInterval() &&
                 candlesticks.size() > pattern.getLastInterval();
     }
 
-    private boolean isEvaluate(double first, double last, PatternCheck check) {
+    protected boolean isEvaluate(double first, double last, PatternCheck check) {
         switch (check) {
             case LESS_THAN:
                 return first < last;
@@ -71,7 +71,7 @@ public class RuleEvaluator {
         return false;
     }
 
-    private double getMeanValue(List<Candlestick> candlesticks, int interval, PatternType patternType) {
+    protected double getMeanValue(List<Candlestick> candlesticks, int interval, PatternType patternType) {
         if (interval < 1 || interval > candlesticks.size()) {
             throw new IllegalStateException("invalid interval range");
         }
@@ -84,7 +84,7 @@ public class RuleEvaluator {
         return mean;
     }
 
-    private double getValue(Candlestick candlestick, PatternType type) {
+    protected double getValue(Candlestick candlestick, PatternType type) {
         switch (type) {
             case LOW:
                 return Double.parseDouble(candlestick.getLow());
