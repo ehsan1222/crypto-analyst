@@ -32,7 +32,7 @@ public class kafkaConsumerConfig {
         Map<String, Object> configs = new HashMap<>();
         configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+//        configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         ObjectMapper om = new ObjectMapper();
         JavaType javaType = om.getTypeFactory().constructParametricType(List.class, Candlestick.class);
