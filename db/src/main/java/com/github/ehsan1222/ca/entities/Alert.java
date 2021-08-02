@@ -41,12 +41,14 @@ public class Alert {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Alert that = (Alert) o;
-        return Objects.equals(id, that.id);
+        Alert alert = (Alert) o;
+        return Objects.equals(rule, alert.rule) &&
+                Objects.equals(market, alert.market) &&
+                Objects.equals(closeDate, alert.closeDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(rule, market, closeDate);
     }
 }
