@@ -19,7 +19,6 @@ script:
   - git clone https://github.com/binance-exchange/binance-java-api.git && cd  binance-java-api && mvn clean install && cd ..
   - mvn clean compile > /dev/null 2>&1
   - mvn org.jacoco:jacoco-maven-plugin:prepare-agent test
-  - mvn cobertura:cobertura
 
 env:
   - CODECOV_TOKEN='dc721415-acfd-481c-a721-0800001ee0b4'
