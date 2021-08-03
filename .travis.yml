@@ -22,7 +22,7 @@ script:
   - mvn cobertura:cobertura
 
 env:
-  - CODECOV_TOKEN=${CODECOV_TOKEN}
+  - CODECOV_TOKEN='dc721415-acfd-481c-a721-0800001ee0b4'
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
