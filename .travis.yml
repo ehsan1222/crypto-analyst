@@ -1,0 +1,25 @@
+language: java
+
+jdk:
+  - openjdk11
+
+install: true
+
+branches:
+  only:
+    - develop
+
+cache:
+  directories:
+    - $HOME/.m2
+
+script:
+  - git clone https://github.com/binance-exchange/binance-java-api.git && cd  binance-java-api && mvn clean install && cd ..
+  - mvn clean compile > /dev/null 2>&1
+  - mvn org.jacoco:jacoco-maven-plugin:prepare-agent test
+
+env:
+  - CODECOV_TOKEN=${CODECOV_TOKEN}
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
