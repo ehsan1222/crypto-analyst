@@ -1,4 +1,4 @@
-# Crypto Analyst
+# Crypto Analyst   [![Build Status](https://travis-ci.com/ehsan1222/crypto-analyst.svg?branch=develop)](https://travis-ci.com/ehsan1222/crypto-analyst)
 
 ### Getting start
 
