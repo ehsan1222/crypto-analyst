@@ -1,5 +1,6 @@
-# Crypto Analyst   [![Build Status](https://travis-ci.com/ehsan1222/crypto-analyst.svg?branch=develop)](https://travis-ci.com/ehsan1222/crypto-analyst)
-
+# Crypto Analyst   
+[![Build Status](https://travis-ci.com/ehsan1222/crypto-analyst.svg?branch=develop)](https://travis-ci.com/ehsan1222/crypto-analyst)
+[![codecov](https://codecov.io/gh/ehsan1222/crypto-analyst/branch/develop/graph/badge.svg?token=1OG0LVPVIM)](https://codecov.io/gh/ehsan1222/crypto-analyst)
 ### Getting start
 
 #### Modules
