@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ehsan1222.ca.crypto.RuleEvaluator;
 import com.github.ehsan1222.ca.dao.Pattern;
 import com.github.ehsan1222.ca.io.FileManager;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -26,7 +26,7 @@ import static com.github.ehsan1222.ca.constants.KafkaConstants.BTC_TOPIC_NAME;
 import static com.github.ehsan1222.ca.constants.KafkaConstants.ETH_TOPIC_NAME;
 
 @Service
-@Log
+@Slf4j
 public class CryptoListenerService {
 
     private final RuleEvaluator ruleEvaluator;
@@ -116,7 +116,7 @@ public class CryptoListenerService {
 
     private List<Pattern> convertJsonToPattern(String pattersJson) {
         if (pattersJson == null) {
-            log.warning("null pattern json was entered");
+            log.warn("null pattern json was entered");
             return new ArrayList<>();
         }
         try {
@@ -125,7 +125,7 @@ public class CryptoListenerService {
                             new TypeReference<ArrayList<Pattern>>() {
                             });
         } catch (JsonProcessingException e) {
-            log.warning("invalid json format " + pattersJson);
+            log.warn("invalid json format " + pattersJson);
             return new ArrayList<>();
         }
     }

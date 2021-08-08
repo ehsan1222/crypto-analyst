@@ -5,13 +5,13 @@ import com.github.ehsan1222.ca.dao.Pattern;
 import com.github.ehsan1222.ca.dao.PatternCheck;
 import com.github.ehsan1222.ca.dao.PatternType;
 import com.github.ehsan1222.ca.services.AlertService;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@Log
+@Slf4j
 public class RuleEvaluator {
 
     private final AlertService alertService;
@@ -32,7 +32,7 @@ public class RuleEvaluator {
 
     protected void evaluate(List<Candlestick> candlesticks, Pattern pattern) {
         if (pattern == null) {
-            log.warning("null pattern was entered");
+            log.warn("null pattern was entered");
             return;
         }
         if (haveEnoughCandlesticksItems(candlesticks, pattern)) {
